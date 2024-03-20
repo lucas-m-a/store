@@ -1,0 +1,176 @@
+function storeMock() {
+  var sourceSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Weekly")
+  var targetSheet = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Master")
+
+//store
+  var sourceCell_Store = sourceSheet.getRange("B1");
+  var targetColumn_Store = targetSheet.getRange("C:C");
+  
+  var value_s = sourceCell_Store.getValue();
+  var lastRow_s = targetSheet.getLastRow();
+
+  targetColumn_Store.getCell(lastRow_s + 1,1).setValue(value_s);
+
+  //sales A
+  var sourceCell_SalesA = sourceSheet.getRange("B3");
+  var targetColumn_SalesA = targetSheet.getRange("D:D");
+  
+  var value_salA = sourceCell_SalesA.getValue();
+  var lastRow_salA = targetSheet.getLastRow();
+
+  targetColumn_SalesA.getCell(lastRow_salA,1).setValue(value_salA);
+
+    //sales B
+  var sourceCell_SalesB = sourceSheet.getRange("B4");
+  var targetColumn_SalesB = targetSheet.getRange("E:E");
+  
+  var value_salB = sourceCell_SalesB.getValue();
+  var lastRow_salB = targetSheet.getLastRow();
+
+  targetColumn_SalesB.getCell(lastRow_salB,1).setValue(value_salB);
+
+    //sales C
+  var sourceCell_SalesC = sourceSheet.getRange("B5");
+  var targetColumn_SalesC = targetSheet.getRange("F:F");
+  
+  var value_salC = sourceCell_SalesC.getValue();
+  var lastRow_salC = targetSheet.getLastRow();
+
+  targetColumn_SalesC.getCell(lastRow_salC,1).setValue(value_salC);
+
+  //year
+  var sourceCell_year = sourceSheet.getRange("B6");
+  var targetColumn_year = targetSheet.getRange("A:A");
+  
+  var value_year = sourceCell_year.getValue();
+  var lastRow_year = targetSheet.getLastRow();
+
+  targetColumn_year.getCell(lastRow_year,1).setValue(value_year);
+
+//week
+  var sourceCell_week = sourceSheet.getRange("B2");
+  var targetColumn_week = targetSheet.getRange("B:B");
+  
+  var value_week = sourceCell_week.getValue();
+  var lastRow_week = targetSheet.getLastRow();
+
+  targetColumn_week.getCell(lastRow_week,1).setValue(value_week);
+
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var masterSheet = ss.getSheetByName("Master");
+
+  // Find the last entry in columns B and C
+  var lastRowB = masterSheet.getRange("B:B").getValues().filter(String).length;
+  var lastRowC = masterSheet.getRange("C:C").getValues().filter(String).length;
+  var lastEntryB = masterSheet.getRange(lastRowB, 2).getValue();
+  var lastEntryC = masterSheet.getRange(lastRowC, 3).getValue();
+
+  // Find all rows matching the last entry in columns B and C
+  var dataRange = masterSheet.getDataRange();
+  var lastRowIndex = dataRange.getLastRow();
+  var dataValues = dataRange.getValues();
+  var matchingRows = [];
+  for (var i = 1; i < lastRowIndex; i++) { // Start from the second row
+    if (dataValues[i][1] == lastEntryB && dataValues[i][2] == lastEntryC) {
+      matchingRows.push(dataValues[i]);
+    }
+  }
+
+  // Create a new sheet for the chart
+  var chartSheet = ss.insertSheet("Chart");
+
+  // Add headers from Master sheet
+  chartSheet.appendRow(masterSheet.getRange(1, 1, 1, 6).getValues()[0]);
+
+  // Add matching rows to the new sheet
+  for (var j = 0; j < matchingRows.length; j++) {
+    chartSheet.appendRow(matchingRows[j]);
+  }
+
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var chartSheet = ss.getSheetByName("Chart");
+
+  // Get last row in column D
+  var lastRowD = chartSheet.getLastRow();
+
+  // Get value from the last row of column D
+  var lastValueD = chartSheet.getRange(lastRowD, 4).getValue();
+
+  // Get values from column D, excluding first and last rows
+  var dataRangeD = chartSheet.getRange("D2:D" + (lastRowD - 1));
+  var dataValuesD = dataRangeD.getValues();
+
+  // Calculate average of column D, excluding first and last rows
+  var totalD = 0;
+  var countD = 0;
+  for (var i = 0; i < dataValuesD.length; i++) {
+    totalD += dataValuesD[i][0];
+    countD++;
+  }
+  var averageD = totalD / countD;
+
+  // Get last row in column E
+  var lastRowE = chartSheet.getLastRow();
+
+  // Get value from the last row of column E
+  var lastValueE = chartSheet.getRange(lastRowE, 5).getValue();
+
+  // Get values from column E, excluding first and last rows
+  var dataRangeE = chartSheet.getRange("E2:E" + (lastRowE - 1));
+  var dataValuesE = dataRangeE.getValues();
+
+  // Calculate average of column E, excluding first and last rows
+  var totalE = 0;
+  var countE = 0;
+  for (var j = 0; j < dataValuesE.length; j++) {
+    totalE += dataValuesE[j][0];
+    countE++;
+  }
+  var averageE = totalE / countE;
+
+  // Get last row in column F
+  var lastRowF = chartSheet.getLastRow();
+
+  // Get value from the last row of column F
+  var lastValueF = chartSheet.getRange(lastRowF, 6).getValue();
+
+  // Get values from column F, excluding first and last rows
+  var dataRangeF = chartSheet.getRange("F2:F" + (lastRowF - 1));
+  var dataValuesF = dataRangeF.getValues();
+
+  // Calculate average of column F, excluding first and last rows
+  var totalF = 0;
+  var countF = 0;
+  for (var k = 0; k < dataValuesF.length; k++) {
+    totalF += dataValuesF[k][0];
+    countF++;
+  }
+  var averageF = totalF / countF;
+
+  // Create a new sheet for the chart
+  var chartDataSheet = ss.insertSheet("ChartData");
+
+  // Populate the data in the chart data sheet
+  chartDataSheet.getRange("A1:B6").setValues([
+    ["Last D", lastValueD],
+    ["Average D", averageD],
+    ["Last E", lastValueE],
+    ["Average E", averageE],
+    ["Last F", lastValueF],
+    ["Average F", averageF]
+  ]);
+
+  // Create chart
+  var chart = chartDataSheet.newChart()
+    .setChartType(Charts.ChartType.COLUMN)
+    .addRange(chartDataSheet.getRange("A1:B6"))
+    .setPosition(4, 4, 0, 0)
+    .build();
+
+// delete "Chart"
+ss.deleteSheet(chartSheet);
+  // Insert chart
+  chartDataSheet.insertChart(chart);
+
+  Browser.msgBox('Master sheet updated successfully!');
+}
